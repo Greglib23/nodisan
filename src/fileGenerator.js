@@ -1,33 +1,32 @@
 import * as fs from 'fs';
 
 export const createEnv = () => {
-    // Contenido del archivo .env
-    const contenido = `
-PORT=
-JWT_SECRET=
-POSTGRES_USER=
-POSTGRES_PASSWORD=
-POSTGRES_DB=
-DATABASE_URL="postgresql://user:pass@localhost:5432/databaseName"
-`;
-
-    // Ruta del archivo .env (puedes cambiar la ruta según tu necesidad)
-    const rutaArchivo = '../../.env';
-
-    // Escribir el contenido en el archivo .env
-    fs.writeFile(rutaArchivo, contenido, (err) => {
+    const startTime = performance.now()
+    console.log("Creating .env...")
+    const content = `
+    PORT=
+    JWT_SECRET=
+    POSTGRES_USER=
+    POSTGRES_PASSWORD=
+    POSTGRES_DB=
+    DATABASE_URL="postgresql://user:pass@localhost:5432/databaseName"
+    `;
+    const path = './.env';
+    fs.writeFile(rutaArchivo, content, (err) => {
         if (err) throw err;
-        console.log('.env created succesfully.');
+        console.log(`Ended in ${performance.now - startTime}ms`);
     });
 }
 
 export const createNodisan = () => {
+    const startTime = performance.now()
+    console.log("Creating .env...")
     const path = `../../nodisan`
-    const content = "TODO"
+    const content = "console.log('Hello World')"
 
     fs.writeFile(path, content, (err) => {
         if (err) throw err;
-        console.log('nodisan created succesfully.');
+        console.log(`Ended in ${performance.now - startTime}ms`);
     });
 }
 export const createFiles = () => {
