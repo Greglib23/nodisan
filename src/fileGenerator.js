@@ -30,4 +30,8 @@ export const createNodisan = () => {
         console.log('nodisan created succesfully.');
     });
 }
+export const createFiles = () => {
+    createEnv()
+    createNodisan()
+}
 

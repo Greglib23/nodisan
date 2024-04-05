@@ -1,4 +1,3 @@
-import { createNodisan, createEnv } from "./fileGenerator.js"
+import { createFiles } from "./fileGenerator.js"
 
-createNodisan()
-createEnv()
+createFiles()
