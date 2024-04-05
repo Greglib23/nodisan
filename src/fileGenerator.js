@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 
-export const createEnv = () => {
-    const startTime = performance.now()
-    console.log("Creating .env...")
+const createEnv = () => {
+    console.log("Creating .env...");
     const content = `
     PORT=
     JWT_SECRET=
@@ -12,25 +11,50 @@ export const createEnv = () => {
     DATABASE_URL="postgresql://user:pass@localhost:5432/databaseName"
     `;
     const path = './.env';
-    fs.writeFile(rutaArchivo, content, (err) => {
-        if (err) throw err;
-        console.log(`Ended in ${performance.now - startTime}ms`);
-    });
-}
-
-export const createNodisan = () => {
-    const startTime = performance.now()
-    console.log("Creating .env...")
-    const path = `../../nodisan`
-    const content = "console.log('Hello World')"
 
     fs.writeFile(path, content, (err) => {
         if (err) throw err;
-        console.log(`Ended in ${performance.now - startTime}ms`);
+    })
+};
+
+const createNodisan = () => {
+    console.log("Creating .env...")
+    const path = `../../nodisan`
+    const content =
+        `import { startProject } from "nodisan/src/index.js";
+
+        startProject()`
+
+    fs.writeFile(path, content, (err) => {
+        if (err) throw err;
     });
 }
-export const createFiles = () => {
+const createAppTs = () => {
+    console.log("Creating .env...");
+    const content =
+        `import dotenv from 'dotenv';
+dotenv.config()
+import express from 'express';
+import authRoutes from './routes/authRoutes'
+import usersRoutes from './routes/userRoutes'
+
+const app = express()
+
+app.use(express.json())
+
+// Routes
+app.use('/auth', authRoutes)
+app.use('/users', usersRoutes)
+
+export default app`
+    const path = './src/app.ts';
+
+    fs.writeFile(path, content, (err) => {
+        if (err) throw err;
+    })
+}
+const createFiles = () => {
     createEnv()
-    createNodisan()
 }
 
+export { createEnv, createNodisan, createFiles }
