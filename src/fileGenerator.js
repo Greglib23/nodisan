@@ -1,115 +1,101 @@
 import * as fs from 'fs';
 
-const createEnv = () => {
-    console.log("Creating .env...");
-    const content = `
-    PORT=3000
-    JWT_SECRET=
-    POSTGRES_USER=
-    POSTGRES_PASSWORD=
-    POSTGRES_DB=
-    DATABASE_URL="postgresql://user:pass@localhost:5432/databaseName"
-    `;
-    const path = './.env';
+let perf
 
-    fs.writeFile(path, content, (err) => {
-        if (err) throw err;
-    })
-};
-
-const createNodisan = () => {
+export const createNodisan = () => {
     console.log("Creating .env...")
     const path = `../../nodisan`
     const content =
-        `import { startProject } from "nodisan/src/index.js";
+        `import { startProject } from "nodisan/index.js";
 startProject()`
 
     fs.writeFile(path, content, (err) => {
         if (err) throw err;
     });
 }
-const createAppTs = () => {
-    console.log("Creating /src/app.ts...");
-    const content =
-        `import dotenv from 'dotenv';
-dotenv.config()
-import express from 'express';
-import authRoutes from './routes/authRoutes'
-import usersRoutes from './routes/userRoutes'
+const createDir = async (json, dir, templatePaths) => {
+    //Creating the directory if no exists
 
-const app = express()
-
-app.use(express.json())
-
-// Routes
-app.use('/auth', authRoutes)
-app.use('/users', usersRoutes)
-
-export default app`
-    fs.mkdirSync('src', { recursive: true });
-    const path = './src/app.ts';
-
-    fs.writeFile(path, content, (err) => {
-        if (err) throw err;
+    return new Promise(resolve => {
+        fs.mkdir(json[dir].path, { recursive: true }, (err) => {
+            if (err) {
+                console.error(`Error making the directory ${json[dir].path}`, err);
+                return;
+            }
+            let time = Math.floor((performance.now() - perf) * 100) / 100
+            console.log(`Generate directory "${json[dir].path}" \u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
+            resolve()
+        })
     })
 }
-const createServerTs = () => {
-    console.log("Creating src/server.ts...");
-    const content =
-        `import app from './app'
 
-        const PORT = process.env.PORT
-        
-        app.listen(PORT, () => {
-            console.log(\`Server is running on PORT: \${PORT}\`)
-        })`
-    fs.mkdirSync('src', { recursive: true });
-    const path = './src/server.ts';
-
-    fs.writeFile(path, content, (err) => {
-        if (err) throw err;
+const verificateDirectory = async (json, dir) => {
+    return new Promise(resolve => {
+        fs.access(json[dir].path, fs.constants.F_OK, (err) => {
+            if (err) {
+                resolve(false)
+            } else {
+                resolve(true)
+            }
+        });
     })
 }
-const createAuthRoutes = () => {
-    console.log("Creating src/routes/server.ts...");
-    const content =
-        `import express from 'express'
-        import { login, register } from '../controllers/authController';
-        
-        const router = express.Router()
-        
-        router.post('/register', register)
-        router.post('/login', login)
-        
-        export default router;`
-    fs.mkdirSync('src/routes', { recursive: true });
-    const path = './src/routes/authRoutes.ts';
+const copyFile = async (json, templatePaths) => {
+    for (const dir in json) {
+        let nameAux
+        //Validating the directory  exists or not
+        let isCreated = await verificateDirectory(json, dir)
+        if (!isCreated) {
+            perf = performance.now()
+            console.log(`Making ${json[dir].path}`)
+            await createDir(json, dir, templatePaths)
+        }
+        //Reading the template to copy              
+        let promiseData = await new Promise(resolve => {
+            fs.readFile(templatePaths + json[dir].fileName, (err, data) => {
+                if (err) {
+                    console.error(`Error reading the file: ${json[dir].fileName} `, err);
+                    return;
+                }
+                json[dir].fileName == ".gitignore_safe" ? nameAux = ".gitignore" : nameAux = json[dir].fileName
+                resolve(data)
+            });
+        })
+        //Pasting the template  
+        console.log(`Generating  "${json[dir].fileName}"`);
+        perf = performance.now()
+        await new Promise(resolve => {
+            fs.writeFile(json[dir].path + nameAux, promiseData, (err) => {
+                if (err) {
+                    console.error(`Error generating the file: ${json[dir].fileName}`,
+                        "\u001B[2m\u001B[31mERR\u001B[39m\u001B[22m", err);
+                    return;
+                }
+                let time = Math.floor((performance.now() - perf) * 100) / 100
+                console.log(`Generating  "${json[dir].fileName}"`, `\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
+                resolve()
+            })
+        })
+    }
+}
 
-    fs.writeFile(path, content, (err) => {
-        if (err) throw err;
+export const createFiles = async () => {
+    const templatePaths = "./node_modules/nodisan/templates/"
+    const json = await new Promise(resolve => {
+        fs.readFile('./node_modules/nodisan/templates/paths.json', 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Error to read file:', err);
+                return;
+            }
+            try {
+                const jsonContent = JSON.parse(data);
+                resolve(jsonContent.paths)
+            } catch (parseErr) {
+                console.error('Error to parse JSON:', parseErr);
+            }
+        });
     })
-}
-const createUserTs = () => {
-    console.log("Creating src/models/user.ts...");
-    const content =
-        `import { PrismaClient } from "@prisma/client";
+    await copyFile(json, templatePaths)
 
-const prisma = new PrismaClient();
-
-export default prisma.user;`
-    fs.mkdirSync('src/models', { recursive: true });
-    const path = './src/models/user.ts';
-
-    fs.writeFile(path, content, (err) => {
-        if (err) throw err;
-    })
-}
-const createFiles = () => {
-    createEnv()
-    createAppTs()
-    createServerTs()
-    createAuthRoutes()
-    createUserTs()
 }
 
-export { createEnv, createNodisan, createFiles }

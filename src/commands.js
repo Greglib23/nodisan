@@ -14,33 +14,33 @@ const addingPropsTs = () => {
     fs.writeFileSync('tsconfig.json', newTsconfigContent);
     console.log("File tsconfig.json succesfully modified.");
 }
-const installCommands = () => {
+const installCommands = async () => {
     const comm1 = "npm install ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/node rimraf prisma --save-dev"
     const comm2 = "npm install express jsonwebtoken bcrypt @prisma/client dotenv typescript"
     const comm3 = "npx tsc --init --outDir dist/ --rootDir src"
 
 
-    const runCommand = (command) => {
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error running dependencies: ${error}`);
-                return;
-            }
-        });
+    const runCommand = async (command) => {
+        await new Promise(resolve => {
+            exec(command, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(`Error running dependencies: ${error}`);
+                    return;
+                }
+                resolve()
+            });
+        })
+
     }
     console.log("Installing dev dependencies...")
-    runCommand(comm1)
+    await runCommand(comm1)
 
     console.log("Installing dependencies...")
-    runCommand(comm2)
+    await runCommand(comm2)
 
     console.log("Running tsc...")
-    exec(comm3, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error running dependencies: ${error}`);
-            return;
-        }
-        addingPropsTs()
-    });
+    await runCommand(comm3)
+
+    addingPropsTs()
 }
 export { installCommands }

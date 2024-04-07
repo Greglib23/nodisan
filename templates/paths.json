@@ -1,0 +1,48 @@
+{
+    "paths": [
+        {
+            "fileName": ".env",
+            "path": "./"
+        },
+        {
+            "fileName": ".env.template",
+            "path": "./"
+        },
+        {
+            "fileName": ".gitignore_safe",
+            "path": "./"
+        },
+        {
+            "fileName": "app.ts",
+            "path": "./src/"
+        },
+        {
+            "fileName": "authController.ts",
+            "path": "./src/controllers/"
+        },
+        {
+            "fileName": "authRoutes.ts",
+            "path": "./src/routes/"
+        },
+        {
+            "fileName": "docker-compose.yaml",
+            "path": "./"
+        },
+        {
+            "fileName": "jwt.interface.ts",
+            "path": "./src/models/"
+        },
+        {
+            "fileName": "server.ts",
+            "path": "./src/"
+        },
+        {
+            "fileName": "user.interface.ts",
+            "path": "./src/models/"
+        },
+        {
+            "fileName": "user.ts",
+            "path": "./src/models/"
+        }
+    ]
+}
