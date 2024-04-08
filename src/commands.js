@@ -19,24 +19,14 @@ const addingPropsTs = () => {
     let time = Math.floor((performance.now() - perf) * 100) / 100
     console.log(`File tsconfig.json succesfully modified. \u001B[1m\u001B[32m in ${time}ms\u001B[39m\u001B[22m`);
 }
-const runCommand = async (command, message) => {
-    if (message) {
-        console.log(message);
+export const runCommand = async (command, msg, msg2) => {
+    if (msg) {
+        console.log(msg);
     }
     perf = performance.now()
     const comm = command.split(" ").splice(0, 1).join()
     const args = command.split(" ").splice(1, command.length)
     await new Promise(resolve => {
-        // exec(command, { stdout: 'inherit' }, (error, stdout, stderr) => {
-        //     if (error) {
-        //         console.error(`Error running command: ${error}`);
-        //         return;
-        //     }
-        //     console.log(stdout)
-        //     let time = Math.floor((performance.now() - perf) * 100) / 100
-        //     console.log(`\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
-        //     resolve()
-        // });
         const execute = spawn(comm, args, { stdio: 'inherit' });
         if (execute.stdout) {
             execute.stdout.on('data', (data) => {
@@ -50,6 +40,8 @@ const runCommand = async (command, message) => {
         }
         execute.on('close', (code) => {
             let time = Math.floor((performance.now() - perf) * 100) / 100
+
+            if (msg2) process.stdout.write(msg2 + " ")
             console.log(`\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
             resolve()
         });
@@ -57,7 +49,7 @@ const runCommand = async (command, message) => {
 
 }
 export const installCommands = async () => {
-    const devComm = "npm install ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/node rimraf prisma --save-dev"
+    const devComm = "npm install tsx ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/node rimraf prisma --save-dev"
     const depComm = "npm install express jsonwebtoken bcrypt @prisma/client dotenv typescript"
     const tsxComm = "npx tsc --init --outDir dist/ --rootDir src"
     await runCommand(devComm, "Installing dev dependencies...")

@@ -1,11 +1,10 @@
 import * as fs from 'fs';
 
 //Creating nodisan.js
-console.log("Creating .env...")
 const path = `../../nodisan.js`
 const content =
-    `import { startProject } from "nodisan/index.js";
-startProject()`
+    `import { handleArguments } from "nodisan/src/handleArguments.js";
+    handleArguments(process.argv)`
 
 fs.writeFile(path, content, (err) => {
     if (err) throw err;
@@ -18,7 +17,7 @@ fs.readFile('../../package.json', (error, data) => {
     }
     const parsedData = JSON.parse(data);
     parsedData.type = "module";
-    parsedData.scripts.dev = "tsnd --respawn --clear src/server.ts"
+    parsedData.scripts.dev = 'tsx src/server.ts'
     parsedData.scripts.build = "rimraf ./dist && tsc"
     parsedData.scripts.start = "node dist/server.js"
     delete parsedData.scripts.install
