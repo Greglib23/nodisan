@@ -1,10 +1,17 @@
-import { createNodisan } from "./fileGenerator.js"
 import * as fs from 'fs';
 
-const path = '../../package.json';
+//Creating nodisan.js
+console.log("Creating .env...")
+const path = `../../nodisan.js`
+const content =
+    `import { startProject } from "nodisan/index.js";
+startProject()`
 
-createNodisan()
-fs.readFile(path, (error, data) => {
+fs.writeFile(path, content, (err) => {
+    if (err) throw err;
+});
+//Adding "type": "module" to package.json
+fs.readFile('../../package.json', (error, data) => {
     if (error) {
         console.log(error);
         return;
@@ -17,7 +24,7 @@ fs.readFile(path, (error, data) => {
     delete parsedData.scripts.install
     delete parsedData.scripts.test
 
-    fs.writeFile(path, JSON.stringify(parsedData, null, 2), (err) => {
+    fs.writeFile('../../package.json', JSON.stringify(parsedData, null, 2), (err) => {
         if (err) {
             console.log('Failed to write updated data to file');
             return;

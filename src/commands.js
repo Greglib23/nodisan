@@ -1,9 +1,11 @@
 import { exec } from 'child_process';
 import * as fs from 'fs';
+import { copyPrismaSchema } from './fileGenerator.js';
 
 let perf
 
 const addingPropsTs = () => {
+    perf = performance.now()
     const tsconfigContent = fs.readFileSync('tsconfig.json', 'utf8');
     const tsconfigContentWithoutComments = tsconfigContent.replace(/\/\/.*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
 
@@ -14,40 +16,39 @@ const addingPropsTs = () => {
 
     const newTsconfigContent = JSON.stringify(tsconfigObject, null, 2);
     fs.writeFileSync('tsconfig.json', newTsconfigContent);
-    console.log("File tsconfig.json succesfully modified.");
+    let time = Math.floor((performance.now() - perf) * 100) / 100
+    console.log(`File tsconfig.json succesfully modified. \u001B[1m\u001B[32m in ${time}ms\u001B[39m\u001B[22m`);
 }
-const installCommands = async () => {
-    const comm1 = "npm install ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/node rimraf prisma --save-dev"
-    const comm2 = "npm install express jsonwebtoken bcrypt @prisma/client dotenv typescript"
-    const comm3 = "npx tsc --init --outDir dist/ --rootDir src"
-
-
-    const runCommand = async (command) => {
-        await new Promise(resolve => {
-            exec(command, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`Error running dependencies: ${error}`);
-                    return;
-                }
-                let time = Math.floor((performance.now() - perf) * 100) / 100
-                console.log(`\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
-                resolve()
-            });
-        })
-
+const runCommand = async (command, message) => {
+    if (message) {
+        console.log(message);
     }
-    console.log("Installing dev dependencies...")
     perf = performance.now()
-    await runCommand(comm1)
+    await new Promise(resolve => {
+        exec(command, { stdio: 'inherit' }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error running command: ${error}`);
+                return;
+            }
+            let time = Math.floor((performance.now() - perf) * 100) / 100
+            console.log(`\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
+            resolve()
+        });
+    })
 
-    console.log("Installing dependencies...")
-    perf = performance.now()
-    await runCommand(comm2)
-
-    console.log("Running tsc...")
-    perf = performance.now()
-    await runCommand(comm3)
-
+}
+export const installCommands = async () => {
+    const devComm = "npm install ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/node rimraf prisma --save-dev"
+    const depComm = "npm install express jsonwebtoken bcrypt @prisma/client dotenv typescript"
+    const tsxComm = "npx tsc --init --outDir dist/ --rootDir src"
+    await runCommand(devComm, "Installing dev dependencies...")
+    await runCommand(depComm, "Installing dependencies...")
+    await runCommand(tsxComm, "Running tsc...")
     addingPropsTs()
 }
-export { installCommands }
+
+export const generatePrisma = async () => {
+    await runCommand("npx prisma init", "Running prisma init...")
+    await copyPrismaSchema()
+    await runCommand("npx prisma generate", "Running prisma generate...")
+}

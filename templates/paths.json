@@ -43,6 +43,22 @@
         {
             "fileName": "user.ts",
             "path": "./src/models/"
+        },
+        {
+            "fileName": "password.service.ts",
+            "path": "./src/services/"
+        },
+        {
+            "fileName": "auth.service.ts",
+            "path": "./src/services/"
+        },
+        {
+            "fileName": "userController.ts",
+            "path": "./src/controllers/"
+        },
+        {
+            "fileName": "userRoutes.ts",
+            "path": "./src/routes/"
         }
     ]
 }

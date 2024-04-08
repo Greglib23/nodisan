@@ -1,18 +1,8 @@
 import * as fs from 'fs';
 
 let perf
+const templatePaths = "./node_modules/nodisan/templates/"
 
-export const createNodisan = () => {
-    console.log("Creating .env...")
-    const path = `../../nodisan`
-    const content =
-        `import { startProject } from "nodisan/index.js";
-startProject()`
-
-    fs.writeFile(path, content, (err) => {
-        if (err) throw err;
-    });
-}
 const createDir = async (json, dir, templatePaths) => {
     //Creating the directory if no exists
 
@@ -47,7 +37,7 @@ const copyFile = async (json, templatePaths) => {
         let isCreated = await verificateDirectory(json, dir)
         if (!isCreated) {
             perf = performance.now()
-            console.log(`Making ${json[dir].path}`)
+            console.log(`Making "${json[dir].path}"`)
             await createDir(json, dir, templatePaths)
         }
         //Reading the template to copy              
@@ -62,7 +52,7 @@ const copyFile = async (json, templatePaths) => {
             });
         })
         //Pasting the template  
-        console.log(`Generating  "${json[dir].fileName}"`);
+        console.log(`Generating  "${nameAux}"`);
         perf = performance.now()
         await new Promise(resolve => {
             fs.writeFile(json[dir].path + nameAux, promiseData, (err) => {
@@ -80,7 +70,6 @@ const copyFile = async (json, templatePaths) => {
 }
 
 export const createFiles = async () => {
-    const templatePaths = "./node_modules/nodisan/templates/"
     const json = await new Promise(resolve => {
         fs.readFile('./node_modules/nodisan/templates/paths.json', 'utf-8', (err, data) => {
             if (err) {
@@ -96,6 +85,32 @@ export const createFiles = async () => {
         });
     })
     await copyFile(json, templatePaths)
-
+}
+export const copyPrismaSchema = async () => {
+    //Reading the template to copy              
+    let promiseData = await new Promise(resolve => {
+        fs.readFile(templatePaths + "schema.prisma", (err, data) => {
+            if (err) {
+                console.error(`Error reading the file: ${json[dir].fileName} `, err);
+                return;
+            }
+            resolve(data)
+        });
+    })
+    //Pasting the template  
+    console.log(`Replacing "schema.prisma"`);
+    perf = performance.now()
+    await new Promise(resolve => {
+        fs.writeFile("./prisma/schema.prisma", promiseData, (err) => {
+            if (err) {
+                console.error(`Error generating the file: "schema.prisma"`,
+                    "\u001B[2m\u001B[31mERR\u001B[39m\u001B[22m", err);
+                return;
+            }
+            let time = Math.floor((performance.now() - perf) * 100) / 100
+            console.log(`Replacing  "schema.prisma"`, `\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
+            resolve()
+        })
+    })
 }
 
