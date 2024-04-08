@@ -1,4 +1,4 @@
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import * as fs from 'fs';
 import { copyPrismaSchema } from './fileGenerator.js';
 
@@ -24,12 +24,31 @@ const runCommand = async (command, message) => {
         console.log(message);
     }
     perf = performance.now()
+    const comm = command.split(" ").splice(0, 1).join()
+    const args = command.split(" ").splice(1, command.length)
     await new Promise(resolve => {
-        exec(command, { stdio: 'inherit' }, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error running command: ${error}`);
-                return;
-            }
+        // exec(command, { stdout: 'inherit' }, (error, stdout, stderr) => {
+        //     if (error) {
+        //         console.error(`Error running command: ${error}`);
+        //         return;
+        //     }
+        //     console.log(stdout)
+        //     let time = Math.floor((performance.now() - perf) * 100) / 100
+        //     console.log(`\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
+        //     resolve()
+        // });
+        const execute = spawn(comm, args, { stdio: 'inherit' });
+        if (execute.stdout) {
+            execute.stdout.on('data', (data) => {
+                console.log(`stdout: ${data}`);
+            });
+        }
+        if (execute.stderr) {
+            execute.stderr.on('data', (data) => {
+                console.error(`stderr: ${data}`);
+            });
+        }
+        execute.on('close', (code) => {
             let time = Math.floor((performance.now() - perf) * 100) / 100
             console.log(`\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
             resolve()
