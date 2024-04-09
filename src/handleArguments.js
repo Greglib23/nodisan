@@ -51,6 +51,7 @@ const handleMake = async (args) => {
             await makeController(args[3])
         }
         if (args[2] == "make:controller" && args[4] == '--resource') {
+            console.log("Enter")
             await makeController(args[3], true)
         }
     }

@@ -1,8 +1,9 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs';
-import { copyPrismaSchema } from './fileGenerator.js';
+import { copyFile } from './fileGenerator.js'
 
 let perf
+const templatePaths = "./node_modules/nodisan/templates/"
 
 const addingPropsTs = () => {
     perf = performance.now()
@@ -13,6 +14,7 @@ const addingPropsTs = () => {
 
     tsconfigObject.exclude = ["node_modules", "dist"];
     tsconfigObject.include = ["src"];
+    tsconfigObject.compilerOptions.module = "es2020"
 
     const newTsconfigContent = JSON.stringify(tsconfigObject, null, 2);
     fs.writeFileSync('tsconfig.json', newTsconfigContent);
@@ -60,6 +62,6 @@ export const installCommands = async () => {
 
 export const generatePrisma = async () => {
     await runCommand("npx prisma init", "Running prisma init...")
-    await copyPrismaSchema()
+    await copyFile(templatePaths + "schema.prisma", "./prisma/", undefined, true)
     await runCommand("npx prisma generate", "Running prisma generate...")
 }

@@ -4,7 +4,8 @@ import * as fs from 'fs';
 const path = `../../nodisan.js`
 const content =
     `import { handleArguments } from "nodisan/src/handleArguments.js";
-    handleArguments(process.argv)`
+
+handleArguments(process.argv)`
 
 fs.writeFile(path, content, (err) => {
     if (err) throw err;
