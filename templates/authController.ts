@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { comparePasswords, hashPassword } from "../services/password.service";
+import { compare, hash } from "../services/password.service";
 import prisma from '../models/user'
 import { generateToken } from "../services/auth.service";
 
@@ -17,7 +17,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
             res.status(400).json({ message: 'El password es obligatorio' })
             return
         }
-        const hashedPassword = await hashPassword(password)
+        const hashedPassword = await hash(password)
 
         const user = await prisma.create(
             {
@@ -65,7 +65,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
             return
         }
 
-        const passwordMatch = await comparePasswords(password, user.password);
+        const passwordMatch = await compare(password, user.password);
         if (!passwordMatch) {
             res.status(401).json({ error: 'Usuario y contraseñas no coinciden' })
         }
