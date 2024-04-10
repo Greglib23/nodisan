@@ -29,7 +29,7 @@ export const runCommand = async (command, msg, msg2) => {
     const comm = command.split(" ").splice(0, 1).join()
     const args = command.split(" ").splice(1, command.length)
     await new Promise(resolve => {
-        const execute = spawn(comm, args, { stdio: 'inherit' });
+        const execute = spawn(comm, args, { stdio: 'inherit', shell: true });
         if (execute.stdout) {
             execute.stdout.on('data', (data) => {
                 console.log(`stdout: ${data}`);
