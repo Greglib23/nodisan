@@ -19,56 +19,53 @@ export const createFirstTemplates = async () => {
         });
     })
     for (const dir in json) {
-        await copyFile(templatePaths + json[dir].fileName, json[dir].path)
+        let fileName = json[dir].fileName
+        fileName == ".gitignore_safe" ? fileName = ".gitignore" : null
+        await copyFile(templatePaths + json[dir].fileName, json[dir].path + fileName)
     }
 }
 
-export const copyFile = async (origin, dest, newName, ovrw) => {
-    let fileName
-    if (newName) {
-        fileName = newName
-    } else {
-        fileName = origin.split("/")[origin.split("/").length - 1]
-    }
-
+export const copyFile = async (origin, dest, ovrw) => {
+    let splited = dest.split("/")
+    let fileName = splited[splited.length - 1]
+    let destPath = splited.slice(0, splited.length - 1).join("/")
     //Validating the directory  exists or not
-    let isCreated = await verificatePath(dest)
+    let isCreated = await verificatePath(destPath)
     if (!isCreated) {
-        await createDir(dest)
+        await createDir(destPath)
     }
     //Reading the template to copy              
     let promiseData = await new Promise(resolve => {
         fs.readFile(origin, (err, data) => {
             if (err) {
-                console.error(`Error reading the file: ${fileName} `, err);
+                console.error(`Error reading the file: ${origin.split("/")[origin.split("/").length - 1]} `, err);
                 return;
             }
-            fileName == ".gitignore_safe" ? fileName = ".gitignore" : null
             resolve(data)
         });
     })
-    isCreated = await verificatePath(dest + fileName)
+    isCreated = await verificatePath(dest)
     if (isCreated && !ovrw) {
-        console.log('The file "', fileName, '" already exist.')
+        console.log('The file "' + fileName + '" already exist.')
     } else {
         //Pasting the template  
         perf = performance.now()
         await new Promise(resolve => {
-            fs.writeFile(dest + fileName, promiseData, (err) => {
+            fs.writeFile(dest, promiseData, (err) => {
                 if (err) {
                     console.error(`Error generating the file: ${fileName}`,
                         "\u001B[2m\u001B[31mERR\u001B[39m\u001B[22m", err);
                     return;
                 }
                 let time = Math.floor((performance.now() - perf) * 100) / 100
-                console.log(`Generating  "${fileName}"`, `\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
+                console.log(`Generating "${fileName}"`, `\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
                 resolve()
             })
         })
     }
 }
 
-const verificatePath = async (path) => {
+export const verificatePath = async (path) => {
     return new Promise(resolve => {
         fs.access(path, fs.constants.F_OK, (err) => {
             if (err) {
@@ -82,7 +79,7 @@ const verificatePath = async (path) => {
 
 const createDir = async (path) => {
     //Creating the directory if no exists
-    console.log(`Making "${path}"`)
+    console.log(`The path: "${path}" does not exists. Creating it...`)
     let perf = performance.now()
     return new Promise(resolve => {
         fs.mkdir(path, { recursive: true }, (err) => {

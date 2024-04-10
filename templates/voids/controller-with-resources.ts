@@ -5,7 +5,7 @@ export const index = async (): Promise<void> => {
     //Show the view for all the instances and basic crud
 }
 
-export const create = async (req: Request, res: Response): Promise<void> => {
+export const create = async (): Promise<void> => {
     //Return the view to create a new instance
 }
 

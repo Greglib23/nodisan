@@ -62,6 +62,6 @@ export const installCommands = async () => {
 
 export const generatePrisma = async () => {
     await runCommand("npx prisma init", "Running prisma init...")
-    await copyFile(templatePaths + "schema.prisma", "./prisma/", undefined, true)
+    await copyFile(templatePaths + "schema.prisma", "./prisma/schema.prisma", true)
     await runCommand("npx prisma generate", "Running prisma generate...")
 }
