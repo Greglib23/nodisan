@@ -106,15 +106,15 @@ export const destroy = async (req: Request, res: Response): Promise<void> => {
         })
 
         res.status(200).json({
-            message: `El usuario ${userId} ha sido eliminado`
+            message: `The user ${userId} was deleted`
         }).end()
 
     } catch (error: any) {
         if (error?.code == 'P2025') {
-            res.status(404).json('Usuario no encontrado')
+            res.status(404).json('User not found')
         } else {
             console.log(error)
-            res.status(500).json({ error: 'Hubo un error, pruebe más tarde' })
+            res.status(500).json({ error: 'An error occurred, try again later' })
         }
     }
 

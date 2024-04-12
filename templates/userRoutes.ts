@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import * as crudUser from '../controllers/userController'
-import { index } from '../controllers/userController'
 import { resource } from 'nodisan/src/resource.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret'

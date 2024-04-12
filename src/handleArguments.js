@@ -31,7 +31,7 @@ export const handleArguments = async (args) => {
         return
     }
     if (args[2].split(":")[0] == "serve") {
-        await runCommand("tsx src/server.ts")
+        await runCommand("npx tsx src/server.ts")
         return
     }
     if (args.length > 2) console.log(prompt + 'Unknow command: "' + args[2] + '"')

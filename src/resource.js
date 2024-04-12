@@ -2,7 +2,7 @@ import express from 'express'
 
 const router = express.Router()
 
-export const resource = (authToken, crudMethods) => {
+export const resource = (router, authToken, crudMethods) => {
     if (crudMethods.index) router.get('/', authToken, crudMethods.index)
     if (crudMethods.create) router.get('/create', authToken, crudMethods.create)
     if (crudMethods.store) router.post('/', authToken, crudMethods.store)
