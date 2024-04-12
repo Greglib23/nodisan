@@ -1,9 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import * as crudUser from '../controllers/userController'
+import { index } from '../controllers/userController'
 import { resource } from 'nodisan/src/resource.js'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret'
+const router = express.Router()
 
 //Middleware of JWT to see if we are authenticated
 
@@ -22,12 +24,6 @@ const authToken = (req: Request, res: Response, next: NextFunction) => {
     })
 }
 
-resource(authToken, crudUser)
-// router.post('/', authToken, createUser)
-// router.get('/', authToken, getAllUsers)
-// router.get('/:id', authToken, getUserById)
-// router.put('/:id', authToken, updateUser)
-// router.delete('/:id', authToken, deleteUser)
-
+resource(router, authToken, crudUser)
 
 export default router;
