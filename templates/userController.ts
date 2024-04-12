@@ -2,8 +2,17 @@ import { Request, Response } from "express";
 import { hash } from "../services/password.service";
 import prisma from '../models/user'
 
+export const index = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const users = await prisma.findMany()
+        res.status(200).json(users);
+    } catch (error: any) {
+        console.log(error)
+        res.status(500).json({ error: 'An error occurred, try again later' })
+    }
+}
 
-export const createUser = async (req: Request, res: Response): Promise<void> => {
+export const store = async (req: Request, res: Response): Promise<void> => {
     try {
         const { email, password } = req.body
         if (!email) {
@@ -33,17 +42,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     }
 }
 
-export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const users = await prisma.findMany()
-        res.status(200).json(users);
-    } catch (error: any) {
-        console.log(error)
-        res.status(500).json({ error: 'An error occurred, try again later' })
-    }
-}
-
-export const getUserById = async (req: Request, res: Response): Promise<void> => {
+export const show = async (req: Request, res: Response): Promise<void> => {
     const userId = parseInt(req.params.id)
     try {
         const user = await prisma.findUnique({
@@ -62,7 +61,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     }
 }
 
-export const updateUser = async (req: Request, res: Response): Promise<void> => {
+export const update = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = parseInt(req.params.id)
         const { email, password } = req.body
@@ -97,7 +96,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     }
 }
 
-export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+export const destroy = async (req: Request, res: Response): Promise<void> => {
     const userId = parseInt(req.params.id)
     try {
         await prisma.delete({

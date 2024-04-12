@@ -1,20 +1,40 @@
 import { startProject } from "../index.js"
 import { runCommand } from "./commands.js"
-import { copyFile, verificatePath } from "./fileGenerator.js"
+import { copyFile, verificatePath, makeStartedFlag } from "./fileGenerator.js"
 import * as fs from 'fs'
 
 const templatePaths = "./node_modules/nodisan/templates/"
+const flagsPath = "./node_modules/nodisan/templates/flags"
+const prompt = "\u001B[1m\u001B[93mnodisan\u001B[39m\u001B[22m: "
 
 export const handleArguments = async (args) => {
+    let isCreated = await verificatePath(flagsPath + "started")
     if (args.length == 2) {
-        return await startProject()
+        if (isCreated) {
+            console.log(prompt + 'Project already started.')
+        } else {
+            await startProject()
+            await makeStartedFlag()
+        }
+        return
+    }
+    if (!isCreated && args.length > 2) {
+        console.log(prompt + 'Project is' + "'" + 'nt started, please run "node nodisan".')
+        return
     }
     if (args[2].split(":")[0] == "migrate") {
         await handleMigrate(args)
+        return
     }
     if (args[2].split(":")[0] == "make") {
         await handleMake(args)
+        return
     }
+    if (args[2].split(":")[0] == "serve") {
+        await runCommand("tsx src/server.ts")
+        return
+    }
+    if (args.length > 2) console.log(prompt + 'Unknow command: "' + args[2] + '"')
 }
 
 const handleMigrate = async (args) => {

@@ -2,19 +2,21 @@ import * as fs from 'fs';
 
 let perf
 const templatePaths = "./node_modules/nodisan/templates/"
+const flagsPath = "./node_modules/nodisan/templates/flags"
+const prompt = "\u001B[1m\u001B[93mnodisan\u001B[39m\u001B[22m: "
 
 export const createFirstTemplates = async () => {
     const json = await new Promise((resolve, reject) => {
         fs.readFile('./node_modules/nodisan/templates/paths.json', 'utf-8', (err, data) => {
             if (err) {
-                console.error('Error to read file:', err);
+                console.error(prompt + 'Error to read file:', err);
                 reject()
             }
             try {
                 const jsonContent = JSON.parse(data);
                 resolve(jsonContent.paths)
             } catch (parseErr) {
-                console.error('Error to parse JSON:', parseErr);
+                console.error(prompt + 'Error to parse JSON:', parseErr);
             }
         });
     })
@@ -35,33 +37,15 @@ export const copyFile = async (origin, dest, ovrw) => {
         await createDir(destPath)
     }
     //Reading the template to copy              
-    let promiseData = await new Promise(resolve => {
-        fs.readFile(origin, (err, data) => {
-            if (err) {
-                console.error(`Error reading the file: ${origin.split("/")[origin.split("/").length - 1]} `, err);
-                return;
-            }
-            resolve(data)
-        });
-    })
+    let data = await readOriginFile(origin)
+    //Verifying if the file already exists
     isCreated = await verificatePath(dest)
     if (isCreated && !ovrw) {
-        console.log('The file "' + fileName + '" already exist.')
+        console.log(prompt + 'The file "' + fileName + '" already exist.')
     } else {
         //Pasting the template  
         perf = performance.now()
-        await new Promise(resolve => {
-            fs.writeFile(dest, promiseData, (err) => {
-                if (err) {
-                    console.error(`Error generating the file: ${fileName}`,
-                        "\u001B[2m\u001B[31mERR\u001B[39m\u001B[22m", err);
-                    return;
-                }
-                let time = Math.floor((performance.now() - perf) * 100) / 100
-                console.log(`Generating "${fileName}"`, `\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
-                resolve()
-            })
-        })
+        await writeDestinyFile(dest, data, fileName)
     }
 }
 
@@ -77,20 +61,57 @@ export const verificatePath = async (path) => {
     })
 }
 
-const createDir = async (path) => {
+const createDir = async (path, silent = false) => {
     //Creating the directory if no exists
-    console.log(`The path: "${path}" does not exists. Creating it...`)
+    if (!silent) console.log(prompt + `The path: "${path}" does not exists. Creating it...`)
     let perf = performance.now()
     return new Promise(resolve => {
         fs.mkdir(path, { recursive: true }, (err) => {
             if (err) {
-                console.error(`Error making the directory ${path}`, err);
+                console.error(prompt + `Error making the directory ${path}`, err);
                 return;
             }
             let time = Math.floor((performance.now() - perf) * 100) / 100
-            console.log(`Generate directory "${path}" \u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
+            if (!silent) console.log(prompt + `Generate directory "${path}" \u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
             resolve()
         })
     })
 }
 
+export const makeStartedFlag = async () => {
+    //Verifying if the directory exists
+    let isCreated = await verificatePath(flagsPath)
+    if (!isCreated) {
+        await createDir(flagsPath, true)
+    }
+    //Writting the file
+    await writeDestinyFile(flagsPath + "started", "", undefined, true)
+}
+
+export const readOriginFile = async (origin) => {
+    let promiseData = await new Promise(resolve => {
+        fs.readFile(origin, (err, data) => {
+            if (err) {
+                console.error(prompt + `Error reading the file: ${origin.split("/")[origin.split("/").length - 1]} `, err);
+                return;
+            }
+            resolve(data)
+        });
+    })
+    return promiseData
+}
+
+export const writeDestinyFile = async (dest, data, fileName, silent = false) => {
+    await new Promise(resolve => {
+        fs.writeFile(dest, data, (err) => {
+            if (err) {
+                console.error(prompt + `Error generating the file: ${fileName}`,
+                    "\u001B[2m\u001B[31mERR\u001B[39m\u001B[22m", err);
+                return;
+            }
+            let time = Math.floor((performance.now() - perf) * 100) / 100
+            if (!silent) console.log(prompt + `Generating "${fileName}"`, `\u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`);
+            resolve()
+        })
+    })
+}
