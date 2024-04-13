@@ -7,6 +7,7 @@ const templatePaths = "./node_modules/nodisan/templates/"
 const flagsPath = "./node_modules/nodisan/templates/flags"
 const prompt = "\u001B[1m\u001B[93mnodisan\u001B[39m\u001B[22m: "
 
+
 export const handleArguments = async (args) => {
     let isCreated = await verificatePath(flagsPath + "started")
     if (args.length == 2) {
@@ -59,14 +60,28 @@ const handleMigrate = async (args) => {
     }
 }
 const handleMake = async (args) => {
-    if (args[3]) {
-        if (args[2] == "make:controller" && !args[4]) {
-            await makeController(args[3])
-        }
-        if (args[2] == "make:controller" && args[4] == '--resource') {
-            await makeController(args[3], true)
-        }
+    if (args[2] == "make") {
+        console.log(prompt + 'You must to specify what you will make. I.e: "node nodisan make:controller controllerName"')
+        return
     }
+    if (args[2] == "make:controller") {//Validate what the program will make
+        if (args[3]) {
+            if (args[4]) {//Validate to create a void template
+                if (args[4] == '--resource') {//Validate if is a resource
+                    await makeController(args[3], true) //Create a resource
+                } else {
+                    console.log(prompt + "Unknow command: '" + args[4])
+                }
+            } else {
+                await makeController(args[3]) //Create void template
+            }
+        } else {
+            console.log(prompt + "You have to write a controller name. Like: " + '"node nodisan make:controller controllerName"')
+        }
+        return
+    }
+    console.log(prompt + 'Unknow command: ' + args[2])
+    return
 }
 const makeController = async (contName, isResource = false) => {
     const modelName = contName.split(/(?=[A-Z])/)[0]
