@@ -39,6 +39,10 @@ export const handleArguments = async (args) => {
         await handleHelp()
         return
     }
+    if (args[2] == "-v" || args[2] == "--version") {
+        await handleVersion()
+        return
+    }
     if (args.length > 2) console.log(prompt + 'Unknow command: "' + args[2] + '"')
 }
 
@@ -148,4 +152,12 @@ const handleHelp = async () => {
     } else {
         console.error("Nothing to change");
     }
+}
+const handleVersion = async () => {
+    const packageJsonPath = './node_modules/nodisan/package.json';
+    const packageJsonContent = await new Promise(resolve => {
+        resolve(fs.readFileSync(packageJsonPath, 'utf8'))
+    })
+    const packageJson = JSON.parse(packageJsonContent);
+    console.log(`Nodisan \u001B[1m\u001B[32mv${packageJson.version}\u001B[39m\u001B[22m`)
 }
