@@ -78,14 +78,14 @@ const createDir = async (path, silent = false) => {
     })
 }
 
-export const makeStartedFlag = async () => {
+export const makeFlag = async (name) => {
     //Verifying if the directory exists
     let isCreated = await verificatePath(flagsPath)
     if (!isCreated) {
         await createDir(flagsPath, true)
     }
     //Writting the file
-    await writeDestinyFile(flagsPath + "started", "", undefined, true)
+    await writeDestinyFile(flagsPath + "/" + name, "", undefined, true)
 }
 
 export const readOriginFile = async (origin) => {

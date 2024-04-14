@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs';
-import { copyFile } from './fileGenerator.js'
+import { copyFile, makeFlag, readOriginFile, verificatePath } from './fileGenerator.js'
+import { createInterface } from 'readline';
 
 let perf
 const templatePaths = "./node_modules/nodisan/templates/"
@@ -64,4 +65,39 @@ export const generatePrisma = async () => {
     await runCommand("npx prisma init", "Running prisma init...")
     await copyFile(templatePaths + "schema.prisma", "./prisma/schema.prisma", true)
     await runCommand("npx prisma generate", "Running prisma generate...")
+}
+export const runVite = async () => {
+    const rl = createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    const positives = ['y', 'yes', 'si', 's']
+    const negatives = ['n', 'no']
+    let create = await new Promise(resolve => {
+        rl.question('Would you like to develop the front-end of the project? (y/n) ', (response) => {
+            resolve(response)
+            rl.close();
+        })
+    })
+    if (positives.includes(create.toLowerCase())) {
+        await runCommand("npx create-vite@latest client", "Running Vite, Nodisan will run again automatically when you are done with Vite....")
+        await runCommand("npm i --prefix client", "Installing vite dependencies...")
+        await makeFlag("front")
+    }
+    if (!negatives.includes(create.toLowerCase()) && !positives.includes(create.toLowerCase())) {
+        console.log('Invalid response. Please answer with "y" or "n".');
+        await runVite()
+    }
+}
+export const doneStart = async () => {
+    console.log(prompt + "You're ready! Now you just need to run:")
+    console.log("   docker-compose up \u001B[1m\u001B[93mor\u001B[39m\u001B[22m docker-compose up -d")
+    console.log("   node nodisan migrate")
+    console.log("   node nodisan serve")
+    let front = await verificatePath(templatePaths + "/flags/front")
+    if (front) {
+        console.log("I see you installed the frontend in your project! You can run it by doing:")
+        console.log("   cd client")
+        console.log("   npm run dev")
+    }
 }

@@ -9,13 +9,13 @@ const prompt = "\u001B[1m\u001B[93mnodisan\u001B[39m\u001B[22m: "
 
 
 export const handleArguments = async (args) => {
-    let isCreated = await verificatePath(flagsPath + "started")
+    let isCreated = await verificatePath(flagsPath + "/started")
     if (args.length == 2) {
         if (isCreated) {
             console.log(prompt + 'Project already started.')
         } else {
             await startProject()
-            await makeStartedFlag()
+            await makeFlag("started")
         }
         return
     }
