@@ -1,6 +1,6 @@
 import { startProject } from "../index.js"
 import { runCommand } from "./commands.js"
-import { copyFile, verificatePath, makeStartedFlag } from "./fileGenerator.js"
+import { copyFile, verificatePath, makeStartedFlag, readOriginFile } from "./fileGenerator.js"
 import * as fs from 'fs'
 
 const templatePaths = "./node_modules/nodisan/templates/"
@@ -33,6 +33,10 @@ export const handleArguments = async (args) => {
     }
     if (args[2].split(":")[0] == "serve") {
         await runCommand("npx tsx src/server.ts")
+        return
+    }
+    if (args[2] == "-h" || args[2] == "--help") {
+        await handleHelp()
         return
     }
     if (args.length > 2) console.log(prompt + 'Unknow command: "' + args[2] + '"')
@@ -94,15 +98,7 @@ const makeController = async (contName, isResource = false) => {
     if (!exists) await replaceInFile(newFilePath, "../models/modelName", `import prisma from '../models/${modelName}'`)
 }
 const replaceInFile = async (filePath, toFind, toReplace) => {
-    let data = await new Promise(resolve => {
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-            resolve(data)
-        });
-    })
+    let data = (await readOriginFile(filePath)).toString()
     // Divide the content in lines
     const lines = data.split('\n');
 
@@ -123,6 +119,32 @@ const replaceInFile = async (filePath, toFind, toReplace) => {
                 resolve()
             });
         })
+    } else {
+        console.error("Nothing to change");
+    }
+}
+const handleHelp = async () => {
+    const packageJsonPath = './node_modules/nodisan/package.json';
+    const packageJsonContent = await new Promise(resolve => {
+        resolve(fs.readFileSync(packageJsonPath, 'utf8'))
+    })
+    const packageJson = JSON.parse(packageJsonContent);
+    let nodVersion = packageJson.version
+    let helpTemp = (await readOriginFile("./node_modules/nodisan/src/help.txt")).toString()
+
+    // Divide the content in lines
+    const lines = helpTemp.split('\n');
+
+    // Find the line that contains the text
+    const index = lines.findIndex(line => line.includes("{version}"));
+
+    if (index !== -1) {
+        lines[index] = lines[index].replace("{version}", nodVersion)
+
+        //Logging the content
+        for (const line in lines) {
+            console.log(eval('"' + lines[line] + '"'));
+        }
     } else {
         console.error("Nothing to change");
     }

@@ -44,7 +44,7 @@ In Nodisan, it can be used like this:
 
 You can see a full list of valid commands by typing:
 
-`node nodisan -h` or `node nodisan --h`
+`node nodisan -h` or `node nodisan --help`
   
 # In development
 
