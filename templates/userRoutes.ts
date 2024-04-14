@@ -23,6 +23,6 @@ const authToken = (req: Request, res: Response, next: NextFunction) => {
     })
 }
 
-resource(router, authToken, crudUser)
+resource(router, crudUser, authToken)
 
 export default router;

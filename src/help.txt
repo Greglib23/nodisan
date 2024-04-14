@@ -3,8 +3,10 @@ Nodisan \u001B[1m\u001B[32mv{version}\u001B[39m\u001B[22m
 \u001B[1m\u001B[93mUsage:\u001B[39m\u001B[22m
     node nodisan \u001B[1m\u001B[32m<command>\u001B[39m\u001B[22m \u001B[1m\u001B[93m[options]\u001B[39m\u001B[22m
 
-\u001B[1m\u001B[93mList of available commands an their respective options:\u001B[39m\u001B[22m
+\u001B[1m\u001B[93mList of available commands and their respective options:\u001B[39m\u001B[22m
 
+    -v
+    --version
     make:controller
     make:controller --resource
     migrate
