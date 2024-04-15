@@ -1,6 +1,6 @@
 import { startProject } from "../index.js"
-import { runCommand } from "./commands.js"
-import { copyFile, verificatePath, makeStartedFlag, readOriginFile } from "./fileGenerator.js"
+import { runCommand, runVite } from "./commands.js"
+import { copyFile, verificatePath, makeFlag, readOriginFile } from "./fileGenerator.js"
 import * as fs from 'fs'
 
 const templatePaths = "./node_modules/nodisan/templates/"
@@ -9,13 +9,13 @@ const prompt = "\u001B[1m\u001B[93mnodisan\u001B[39m\u001B[22m: "
 
 
 export const handleArguments = async (args) => {
-    let isCreated = await verificatePath(flagsPath + "started")
+    let isCreated = await verificatePath(flagsPath + "/started")
     if (args.length == 2) {
         if (isCreated) {
             console.log(prompt + 'Project already started.')
         } else {
             await startProject()
-            await makeStartedFlag()
+            await makeFlag("started")
         }
         return
     }
@@ -43,6 +43,11 @@ export const handleArguments = async (args) => {
         await handleVersion()
         return
     }
+    if (args[2].split(":")[0] == "install") {
+        await handleInstall(args)
+        return
+    }
+
     if (args.length > 2) console.log(prompt + 'Unknow command: "' + args[2] + '"')
 }
 
@@ -160,4 +165,23 @@ const handleVersion = async () => {
     })
     const packageJson = JSON.parse(packageJsonContent);
     console.log(`Nodisan \u001B[1m\u001B[32mv${packageJson.version}\u001B[39m\u001B[22m`)
+}
+const handleInstall = async (args) => {
+    if (args[2].split(":")[1] === "vite") {
+        let isCreated = await verificatePath(flagsPath + "/front")
+        if (isCreated) {
+            console.log(prompt + "Vite already installed.")
+            return
+        } else {
+            await runVite()
+            let front = await verificatePath(templatePaths + "/flags/front")
+            if (front) {
+                console.log(prompt + "I see you installed the frontend in your project! You can run it by doing:")
+                console.log("       cd client")
+                console.log("       npm run dev")
+            }
+            return
+        }
+    }
+    console.log(prompt + "Unknow command: " + args[2])
 }

@@ -1,3 +1,4 @@
+
 # Nodisan
 
 Nodisan is a boilerplate generator inspired in **artisan** from **laravel**. This module for nodejs works similar to that and that makes it possible to enjoy all the benefits that this entails.
@@ -5,7 +6,9 @@ Nodisan is a boilerplate generator inspired in **artisan** from **laravel**. Thi
 # Requirements
 
 | Nodejs | Npm |
+
 |--|--|
+
 | <img src="https://www.svgrepo.com/show/376337/node-js.svg" alt="Node.js Logo" width="150" height="150" /> |<img src="https://cdn.iconscout.com/icon/free/png-256/free-npm-3-1175132.png" alt="Node.js Logo" width="150" height="150" /> |
 
 # Instalation
@@ -14,7 +17,7 @@ To start a backend project with nodisan, you only have to start a new project in
 
 `mkdir first-nodisan-project`
 
-`cd first-nodisan-project`  
+`cd first-nodisan-project`
 
 Then run:
 
@@ -28,7 +31,7 @@ This file is the entry point of the application and it is the one that will gene
 
 To start the process of creating them, you only have to do:
 
- `node nodisan`  
+`node nodisan`
 
 And, in principle, that is all.
 
@@ -45,20 +48,37 @@ In Nodisan, it can be used like this:
 You can see a full list of valid commands by typing:
 
 `node nodisan -h` or `node nodisan --help`
-  
+
+# Functions
+
+## resource()
+
+This method gives you the possibility to skip the **get**, **post**, **put**, and **delete** configuration, making it automatic if you started your controller with the `--resource` tag.
+You must add the import at the top of your route file:
+
+`import { resource } from 'nodisan/src/resource.js'`
+
+Also, add the additional imports and their respective assignments:
+
+`import express from 'express'`
+`import  *  as crudMethods from  '../controllers/controllerName'`
+`const router = express.Router()`
+
+Now you can run:
+
+`resource(router,  crudMethods,  middleware)`
+
 # In development
-
-- Integration with front end libraries
-
+  
 - Integration of tipical commands of artisan, considering the differences between php and js, commands like:
 
-`php artisan make:model modelName`  
+<dd><code>php artisan make:model modelName</code><dd><br>
 
-Will be used on your console like:
+<dd>Will be used on your console like:</dd><br>
 
-`node nodisan make:model modelName`  
+<dd><code>node nodisan make:model modelName</code><dd>
 
-# Contact  
+# Contact
 
 - [LinkedIn](https://www.linkedin.com/feed/)
 

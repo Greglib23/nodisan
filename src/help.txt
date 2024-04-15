@@ -7,6 +7,7 @@ Nodisan \u001B[1m\u001B[32mv{version}\u001B[39m\u001B[22m
 
     -v
     --version
+    install:vite
     make:controller
     make:controller --resource
     migrate
