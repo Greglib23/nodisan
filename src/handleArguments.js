@@ -1,7 +1,8 @@
 import { startProject } from "../index.js"
 import { runCommand, runVite } from "./commands.js"
-import { copyFile, verificatePath, makeFlag, readOriginFile } from "./fileGenerator.js"
+import { copyFile, verificatePath, makeFlag, readOriginFile, copyFiles } from "./fileGenerator.js"
 import * as fs from 'fs'
+
 
 const templatePaths = "./node_modules/nodisan/templates/"
 const flagsPath = "./node_modules/nodisan/templates/flags"
@@ -45,6 +46,10 @@ export const handleArguments = async (args) => {
     }
     if (args[2].split(":")[0] == "install") {
         await handleInstall(args)
+        return
+    }
+    if (args[2].split(":")[0] == "build") {
+        await handleBuild(args)
         return
     }
 
@@ -168,7 +173,7 @@ const handleVersion = async () => {
 }
 const handleInstall = async (args) => {
     if (args[2].split(":")[1] === "vite") {
-        let isCreated = await verificatePath(flagsPath + "/front")
+        let isCreated = await verificatePath("./client")
         if (isCreated) {
             console.log(prompt + "Vite already installed.")
             return
@@ -184,4 +189,48 @@ const handleInstall = async (args) => {
         }
     }
     console.log(prompt + "Unknow command: " + args[2])
+}
+const handleBuild = async (args) => {
+    let option = args[3]
+    let backDist = await verificatePath("./dist")
+    let frontDist = await verificatePath("./client/dist")
+    let client = await verificatePath("./client")
+    if (option) {
+        if (client) {
+            if (option === '--frontend' || option === '--front') {
+                if (frontDist) {
+                    console.log(prompt + "Client folder already have a " + '"dist" folder.')
+                    return
+                }
+                await runCommand("npm run build --prefix client", "Building frontend...")
+                await copyFiles("./client/dist", "./dist/client", "Copying files from front dist to backend dist...")
+                return
+            }
+
+        } else {
+            console.log(prompt + "There are no frontend files on your project")
+        }
+        if (option === '--backend' || option === '--back') {
+            if (backDist) {
+                console.log(prompt + "Root folder already have a " + '"dist" folder.')
+                return
+            }
+            await runCommand("npm run build", "Building backend...")
+            return
+        }
+    } else {
+        if (backDist) {
+            console.log(prompt + "Root folder already have a " + '"dist" folder.')
+            return
+        }
+        if (frontDist) {
+            console.log(prompt + "Client folder already have a " + '"dist" folder.')
+            return
+        }
+        await runCommand("npm run build", "Building backend...")
+        if (client) {
+            await runCommand("npm run build --prefix client", "Building frontend...")
+            await copyFiles("./client/dist", "./dist/client", "Copying files from front dist to backend dist...")
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { join } from 'path'
 
 let perf
 const templatePaths = "./node_modules/nodisan/templates/"
@@ -114,4 +115,22 @@ export const writeDestinyFile = async (dest, data, fileName, silent = false) => 
             resolve()
         })
     })
+}
+export const copyFiles = async (from, to, msg1, msg2, silent) => {
+    perf = performance.now()
+    if (msg1) console.log(prompt + msg1)
+    const files = await fs.promises.readdir(from, { withFileTypes: true });
+    for (const file of files) {
+        const sourcePath = join(from, file.name);
+        const destPath = join(to, file.name);
+        if (file.isDirectory()) {
+            await fs.promises.mkdir(destPath, { recursive: true });
+            await copyFiles(sourcePath, destPath, undefined, undefined, true);
+        } else {
+            await fs.promises.copyFile(sourcePath, destPath);
+        }
+    }
+    let time = Math.floor((performance.now() - perf) * 100) / 100
+    if (msg2) console.log(prompt + msg2)
+    if (!silent) console.log(prompt + `Copying files from ${from} to ${to} \u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
 }

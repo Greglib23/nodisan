@@ -5,11 +5,14 @@ Nodisan \u001B[1m\u001B[32mv{version}\u001B[39m\u001B[22m
 
 \u001B[1m\u001B[93mList of available commands and their respective options:\u001B[39m\u001B[22m
 
-    -v
+    -v      \u001B[3m\u001B[90mShows the version of nodisan\u001B[39m\u001B[23m
     --version
-    install:vite
-    make:controller
-    make:controller --resource
-    migrate
-    migrate:status
-    migrate:reset
+    build       \u001B[3m\u001B[90mBuild backend and frontend\u001B[39m\u001B[23m
+    build --back or --backend       \u001B[3m\u001B[90mBuild only backend\u001B[39m\u001B[23m
+    build --front or --frontend     \u001B[3m\u001B[90mBuild only frontend\u001B[39m\u001B[23m
+    install:vite        \u001B[3m\u001B[90mMake the instalation of vite if you don't did it on the start of the project\u001B[39m\u001B[23m
+    make:controller     \u001B[3m\u001B[90mMake a new void controller\u001B[39m\u001B[23m
+    make:controller --resource      \u001B[3m\u001B[90mMake a controller with the basic crud methods\u001B[39m\u001B[23m
+    migrate     \u001B[3m\u001B[90mReaize the prisma migrations\u001B[39m\u001B[23m
+    migrate:status      \u001B[3m\u001B[90mShows the current state of the migrations\u001B[39m\u001B[23m
+    migrate:reset       \u001B[3m\u001B[90mRollback all the migrations\u001B[39m\u001B[23m
