@@ -1,7 +1,3 @@
-import express from 'express'
-
-const router = express.Router()
-
 export const resource = (router, crudMethods, middleware) => {
     if (middleware) {
         if (crudMethods.index) router.get('/', middleware, crudMethods.index)

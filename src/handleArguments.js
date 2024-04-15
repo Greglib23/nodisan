@@ -168,14 +168,20 @@ const handleVersion = async () => {
 }
 const handleInstall = async (args) => {
     if (args[2].split(":")[1] === "vite") {
-        await runVite()
-        let front = await verificatePath(templatePaths + "/flags/front")
-        if (front) {
-            console.log(prompt + "I see you installed the frontend in your project! You can run it by doing:")
-            console.log("       cd client")
-            console.log("       npm run dev")
+        let isCreated = await verificatePath(flagsPath + "/front")
+        if (isCreated) {
+            console.log(prompt + "Vite already installed.")
+            return
+        } else {
+            await runVite()
+            let front = await verificatePath(templatePaths + "/flags/front")
+            if (front) {
+                console.log(prompt + "I see you installed the frontend in your project! You can run it by doing:")
+                console.log("       cd client")
+                console.log("       npm run dev")
+            }
+            return
         }
-        return
     }
     console.log(prompt + "Unknow command: " + args[2])
 }

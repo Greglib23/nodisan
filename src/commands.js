@@ -16,7 +16,8 @@ const addingPropsTs = () => {
 
     tsconfigObject.exclude = ["node_modules", "dist"];
     tsconfigObject.include = ["src"];
-    tsconfigObject.compilerOptions.module = "es2020"
+    // tsconfigObject.compilerOptions.module = "es2020"
+    tsconfigObject.compilerOptions.jsx = "react-jsx"
 
     const newTsconfigContent = JSON.stringify(tsconfigObject, null, 2);
     fs.writeFileSync('tsconfig.json', newTsconfigContent);
