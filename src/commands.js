@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs';
-import { copyFile, makeFlag, readOriginFile, verificatePath } from './fileGenerator.js'
+import { copyFile, makeFlag, verificatePath } from './fileGenerator.js'
 import { createInterface } from 'readline';
 
 let perf
@@ -94,10 +94,11 @@ export const doneStart = async () => {
     console.log("   docker-compose up \u001B[1m\u001B[93mor\u001B[39m\u001B[22m docker-compose up -d")
     console.log("   node nodisan migrate")
     console.log("   node nodisan serve")
+    console.log("")
     let front = await verificatePath(templatePaths + "/flags/front")
     if (front) {
-        console.log("I see you installed the frontend in your project! You can run it by doing:")
-        console.log("   cd client")
-        console.log("   npm run dev")
+        console.log(prompt + "I see you installed the frontend in your project! You can run it by doing:")
+        console.log("       cd client")
+        console.log("       npm run dev")
     }
 }
