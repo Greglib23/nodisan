@@ -6,9 +6,7 @@ Nodisan is a boilerplate generator inspired in **artisan** from **laravel**. Thi
 # Requirements
 
 | Nodejs | Npm |
-
 |--|--|
-
 | <img src="https://www.svgrepo.com/show/376337/node-js.svg" alt="Node.js Logo" width="150" height="150" /> |<img src="https://cdn.iconscout.com/icon/free/png-256/free-npm-3-1175132.png" alt="Node.js Logo" width="150" height="150" /> |
 
 # Instalation
