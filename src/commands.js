@@ -91,15 +91,21 @@ export const runVite = async () => {
     }
 }
 export const doneStart = async () => {
+    console.log("")
+    console.log("")
     console.log(prompt + "You're ready! Now you just need to run:")
-    console.log("   docker-compose up \u001B[1m\u001B[93mor\u001B[39m\u001B[22m docker-compose up -d")
-    console.log("   node nodisan migrate")
-    console.log("   node nodisan serve")
+    console.log("")
+    console.log("\u001B[1m\u001B[32mdocker-compose up\u001B[39m\u001B[22m \u001B[1m\u001B[93mor\u001B[39m\u001B[22m \u001B[1m\u001B[32mdocker-compose up -d\u001B[39m\u001B[22m")
+    console.log("\u001B[1m\u001B[32mnode nodisan migrate\u001B[39m\u001B[22m")
+    console.log("\u001B[1m\u001B[32mnode nodisan serve\u001B[39m\u001B[22m")
     console.log("")
     let front = await verificatePath(templatePaths + "/flags/front")
     if (front) {
         console.log(prompt + "I see you installed the frontend in your project! You can run it by doing:")
-        console.log("       cd client")
-        console.log("       npm run dev")
+        console.log("")
+        console.log("\u001B[1m\u001B[32mcd client\u001B[39m\u001B[22m")
+        console.log("\u001B[1m\u001B[32mnpm run dev\u001B[39m\u001B[22m")
+        console.log("")
     }
+    console.log("")
 }
