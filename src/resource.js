@@ -1,4 +1,4 @@
-export const resource = (router, crudMethods, middleware) => {
+const resource = (router, crudMethods, middleware) => {
     if (middleware) {
         if (crudMethods.index) router.get('/', middleware, crudMethods.index)
         if (crudMethods.create) router.get('/create', middleware, crudMethods.create)
@@ -17,3 +17,4 @@ export const resource = (router, crudMethods, middleware) => {
         if (crudMethods.destroy) router.delete('/:id', crudMethods.destroy)
     }
 }
+export default resource

@@ -106,6 +106,19 @@ const handleMake = async (args) => {
         }
         return
     }
+    if (args[2] == "make:model") {//Validate what the program will make
+        if (args[3]) {
+            if (args[4] === "--migration") {
+                await makeModel(args[3])
+                await makeMigration("create_" + args[3] + "_table")
+            } else {
+                await makeModel(args[3])
+            }
+        } else {
+            console.log(prompt + `You have to write a model name. Like: '"node nodisan make:controller controllerName"`)
+        }
+        return
+    }
     console.log(prompt + 'Unknow command: ' + args[2])
     return
 }
@@ -117,7 +130,7 @@ const makeController = async (contName, isResource = false) => {
     if (isResource) await copyFile(templatePaths + "voids/controller-with-resources.ts", newFilePath)
     else await copyFile(templatePaths + "voids/controller.ts", newFilePath)
 
-    if (!exists) await replaceInFile(newFilePath, "../models/modelName", `import prisma from '../models/${modelName}'`)
+    if (!exists) await replaceInFile(newFilePath, "modelName", modelName)
 }
 const replaceInFile = async (filePath, toFind, toReplace) => {
     let data = (await readOriginFile(filePath)).toString()
@@ -128,7 +141,7 @@ const replaceInFile = async (filePath, toFind, toReplace) => {
     const index = lines.findIndex(line => line.includes(toFind));
 
     if (index !== -1) {
-        lines[index] = toReplace;
+        lines[index] = lines[index].replace(toFind, toReplace);
         const modifiedContent = lines.join('\n');
 
         // Writting the file modified
@@ -268,10 +281,24 @@ const getMigrationName = async (migName) => {
     const completeDate = `${year}_${month.toString().padStart(2, '0')}_${day.toString().padStart(2, '0')}_`;
     const completeHour = `${hours.toString().padStart(2, '0')}${minutes.toString().padStart(2, '0')}${secconds.toString().padStart(2, '0')}`;
     if (migName) {
-        let fileName = completeDate + completeHour + migName + ".ts"
+        let fileName = completeDate + completeHour + "_" + migName + ".ts"
         return fileName
     } else {
         let fileName = completeDate + completeHour + ".ts"
         return fileName
+    }
+}
+const makeModel = async (modelName) => {
+    const modelPath = "./src/models"
+    const isCreated = await verificatePath(modelPath + "/" + modelName)
+    const dataModel = await readOriginFile("./node_modules/nodisan/templates/voids/models.ts")
+    const dataInterface = await readOriginFile("./node_modules/nodisan/templates/voids/models.interface.ts")
+    if (isCreated) {
+        console.log(prompt + `File ${modelName + ".ts"} alredy exists.`)
+    } else {
+        await writeDestinyFile(modelPath + "/" + modelName + ".ts", dataModel)
+        await replaceInFile(modelPath + "/" + modelName + ".ts", "{ modelName }", modelName)
+        await writeDestinyFile(modelPath + "/" + modelName + ".interface.ts", dataInterface)
+        await replaceInFile(modelPath + "/" + modelName + ".interface.ts", "{ modelName }", modelName.charAt(0).toUpperCase() + modelName.slice(1))
     }
 }
