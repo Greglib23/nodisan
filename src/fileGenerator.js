@@ -46,7 +46,7 @@ export const copyFile = async (origin, dest, ovrw) => {
     } else {
         //Pasting the template  
         perf = performance.now()
-        await writeDestinyFile(dest, data, fileName)
+        await writeDestinyFile(dest, data)
     }
 }
 
@@ -62,7 +62,7 @@ export const verificatePath = async (path) => {
     })
 }
 
-const createDir = async (path, silent = false) => {
+export const createDir = async (path, silent = false) => {
     //Creating the directory if no exists
     if (!silent) console.log(prompt + `The path: "${path}" does not exists. Creating it...`)
     let perf = performance.now()
@@ -86,7 +86,7 @@ export const makeFlag = async (name) => {
         await createDir(flagsPath, true)
     }
     //Writting the file
-    await writeDestinyFile(flagsPath + "/" + name, "", undefined, true)
+    await writeDestinyFile(flagsPath + "/" + name, "", true)
 }
 
 export const readOriginFile = async (origin) => {
@@ -102,7 +102,8 @@ export const readOriginFile = async (origin) => {
     return promiseData
 }
 
-export const writeDestinyFile = async (dest, data, fileName, silent = false) => {
+export const writeDestinyFile = async (dest, data, silent = false) => {
+    let fileName = dest.split("/")[dest.split("/").length - 1]
     await new Promise(resolve => {
         fs.writeFile(dest, data, (err) => {
             if (err) {
@@ -116,7 +117,7 @@ export const writeDestinyFile = async (dest, data, fileName, silent = false) => 
         })
     })
 }
-export const copyFiles = async (from, to, msg1, msg2, silent) => {
+export const copyFiles = async (from, to, msg1, msg2, silent = false) => {
     perf = performance.now()
     if (msg1) console.log(prompt + msg1)
     const files = await fs.promises.readdir(from, { withFileTypes: true });

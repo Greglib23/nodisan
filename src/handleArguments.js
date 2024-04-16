@@ -1,6 +1,6 @@
 import { startProject } from "../index.js"
 import { runCommand, runVite } from "./commands.js"
-import { copyFile, verificatePath, makeFlag, readOriginFile, copyFiles } from "./fileGenerator.js"
+import { copyFile, verificatePath, makeFlag, readOriginFile, copyFiles, writeDestinyFile, createDir } from "./fileGenerator.js"
 import * as fs from 'fs'
 
 
@@ -95,6 +95,14 @@ const handleMake = async (args) => {
             }
         } else {
             console.log(prompt + "You have to write a controller name. Like: " + '"node nodisan make:controller controllerName"')
+        }
+        return
+    }
+    if (args[2] == "make:migration") {//Validate what the program will make
+        if (args[3]) {
+            await makeMigration(args[3])
+        } else {
+            await makeMigration()
         }
         return
     }
@@ -232,5 +240,38 @@ const handleBuild = async (args) => {
             await runCommand("npm run build --prefix client", "Building frontend...")
             await copyFiles("./client/dist", "./dist/client", "Copying files from front dist to backend dist...")
         }
+    }
+}
+const makeMigration = async (migName) => {
+    let fileName = await getMigrationName(migName)
+    let migPath = "./src/database/migrations"
+    let isCreated = await verificatePath(migPath)
+    console.log(fileName)
+    if (isCreated) {
+        await writeDestinyFile(migPath + "/" + fileName, "")
+    } else {
+        await createDir(migPath)
+        await writeDestinyFile(migPath + "/" + fileName, "")
+    }
+}
+const getMigrationName = async (migName) => {
+    const currentDate = new Date();
+    // Get the components of date
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const day = currentDate.getDate();
+    // Get the components of hour
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    const secconds = currentDate.getSeconds();
+    // Format date and hour
+    const completeDate = `${year}_${month.toString().padStart(2, '0')}_${day.toString().padStart(2, '0')}_`;
+    const completeHour = `${hours.toString().padStart(2, '0')}${minutes.toString().padStart(2, '0')}${secconds.toString().padStart(2, '0')}`;
+    if (migName) {
+        let fileName = completeDate + completeHour + migName + ".ts"
+        return fileName
+    } else {
+        let fileName = completeDate + completeHour + ".ts"
+        return fileName
     }
 }
