@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { join } from 'path'
 
 let perf
 const templatePaths = "./node_modules/nodisan/templates/"
@@ -45,7 +46,7 @@ export const copyFile = async (origin, dest, ovrw) => {
     } else {
         //Pasting the template  
         perf = performance.now()
-        await writeDestinyFile(dest, data, fileName)
+        await writeDestinyFile(dest, data)
     }
 }
 
@@ -61,7 +62,7 @@ export const verificatePath = async (path) => {
     })
 }
 
-const createDir = async (path, silent = false) => {
+export const createDir = async (path, silent = false) => {
     //Creating the directory if no exists
     if (!silent) console.log(prompt + `The path: "${path}" does not exists. Creating it...`)
     let perf = performance.now()
@@ -85,7 +86,7 @@ export const makeFlag = async (name) => {
         await createDir(flagsPath, true)
     }
     //Writting the file
-    await writeDestinyFile(flagsPath + "/" + name, "", undefined, true)
+    await writeDestinyFile(flagsPath + "/" + name, "", true)
 }
 
 export const readOriginFile = async (origin) => {
@@ -101,7 +102,8 @@ export const readOriginFile = async (origin) => {
     return promiseData
 }
 
-export const writeDestinyFile = async (dest, data, fileName, silent = false) => {
+export const writeDestinyFile = async (dest, data, silent = false) => {
+    let fileName = dest.split("/")[dest.split("/").length - 1]
     await new Promise(resolve => {
         fs.writeFile(dest, data, (err) => {
             if (err) {
@@ -114,4 +116,22 @@ export const writeDestinyFile = async (dest, data, fileName, silent = false) => 
             resolve()
         })
     })
+}
+export const copyFiles = async (from, to, msg1, msg2, silent = false) => {
+    perf = performance.now()
+    if (msg1) console.log(prompt + msg1)
+    const files = await fs.promises.readdir(from, { withFileTypes: true });
+    for (const file of files) {
+        const sourcePath = join(from, file.name);
+        const destPath = join(to, file.name);
+        if (file.isDirectory()) {
+            await fs.promises.mkdir(destPath, { recursive: true });
+            await copyFiles(sourcePath, destPath, undefined, undefined, true);
+        } else {
+            await fs.promises.copyFile(sourcePath, destPath);
+        }
+    }
+    let time = Math.floor((performance.now() - perf) * 100) / 100
+    if (msg2) console.log(prompt + msg2)
+    if (!silent) console.log(prompt + `Copying files from ${from} to ${to} \u001B[1m\u001B[32mDONE in ${time}ms\u001B[39m\u001B[22m`)
 }

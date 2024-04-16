@@ -1,7 +1,8 @@
 import { startProject } from "../index.js"
 import { runCommand, runVite } from "./commands.js"
-import { copyFile, verificatePath, makeFlag, readOriginFile } from "./fileGenerator.js"
+import { copyFile, verificatePath, makeFlag, readOriginFile, copyFiles, writeDestinyFile, createDir } from "./fileGenerator.js"
 import * as fs from 'fs'
+
 
 const templatePaths = "./node_modules/nodisan/templates/"
 const flagsPath = "./node_modules/nodisan/templates/flags"
@@ -45,6 +46,10 @@ export const handleArguments = async (args) => {
     }
     if (args[2].split(":")[0] == "install") {
         await handleInstall(args)
+        return
+    }
+    if (args[2].split(":")[0] == "build") {
+        await handleBuild(args)
         return
     }
 
@@ -93,6 +98,27 @@ const handleMake = async (args) => {
         }
         return
     }
+    if (args[2] == "make:migration") {//Validate what the program will make
+        if (args[3]) {
+            await makeMigration(args[3])
+        } else {
+            await makeMigration()
+        }
+        return
+    }
+    if (args[2] == "make:model") {//Validate what the program will make
+        if (args[3]) {
+            if (args[4] === "--migration") {
+                await makeModel(args[3])
+                await makeMigration("create_" + args[3] + "_table")
+            } else {
+                await makeModel(args[3])
+            }
+        } else {
+            console.log(prompt + `You have to write a model name. Like: '"node nodisan make:controller controllerName"`)
+        }
+        return
+    }
     console.log(prompt + 'Unknow command: ' + args[2])
     return
 }
@@ -104,7 +130,7 @@ const makeController = async (contName, isResource = false) => {
     if (isResource) await copyFile(templatePaths + "voids/controller-with-resources.ts", newFilePath)
     else await copyFile(templatePaths + "voids/controller.ts", newFilePath)
 
-    if (!exists) await replaceInFile(newFilePath, "../models/modelName", `import prisma from '../models/${modelName}'`)
+    if (!exists) await replaceInFile(newFilePath, "modelName", modelName)
 }
 const replaceInFile = async (filePath, toFind, toReplace) => {
     let data = (await readOriginFile(filePath)).toString()
@@ -115,7 +141,7 @@ const replaceInFile = async (filePath, toFind, toReplace) => {
     const index = lines.findIndex(line => line.includes(toFind));
 
     if (index !== -1) {
-        lines[index] = toReplace;
+        lines[index] = lines[index].replace(toFind, toReplace);
         const modifiedContent = lines.join('\n');
 
         // Writting the file modified
@@ -168,7 +194,7 @@ const handleVersion = async () => {
 }
 const handleInstall = async (args) => {
     if (args[2].split(":")[1] === "vite") {
-        let isCreated = await verificatePath(flagsPath + "/front")
+        let isCreated = await verificatePath("./client")
         if (isCreated) {
             console.log(prompt + "Vite already installed.")
             return
@@ -184,4 +210,95 @@ const handleInstall = async (args) => {
         }
     }
     console.log(prompt + "Unknow command: " + args[2])
+}
+const handleBuild = async (args) => {
+    let option = args[3]
+    let backDist = await verificatePath("./dist")
+    let frontDist = await verificatePath("./client/dist")
+    let client = await verificatePath("./client")
+    if (option) {
+        if (client) {
+            if (option === '--frontend' || option === '--front') {
+                if (frontDist) {
+                    console.log(prompt + "Client folder already have a " + '"dist" folder.')
+                    return
+                }
+                await runCommand("npm run build --prefix client", "Building frontend...")
+                await copyFiles("./client/dist", "./dist/client", "Copying files from front dist to backend dist...")
+                return
+            }
+
+        } else {
+            console.log(prompt + "There are no frontend files on your project")
+        }
+        if (option === '--backend' || option === '--back') {
+            if (backDist) {
+                console.log(prompt + "Root folder already have a " + '"dist" folder.')
+                return
+            }
+            await runCommand("npm run build", "Building backend...")
+            return
+        }
+    } else {
+        if (backDist) {
+            console.log(prompt + "Root folder already have a " + '"dist" folder.')
+            return
+        }
+        if (frontDist) {
+            console.log(prompt + "Client folder already have a " + '"dist" folder.')
+            return
+        }
+        await runCommand("npm run build", "Building backend...")
+        if (client) {
+            await runCommand("npm run build --prefix client", "Building frontend...")
+            await copyFiles("./client/dist", "./dist/client", "Copying files from front dist to backend dist...")
+        }
+    }
+}
+const makeMigration = async (migName) => {
+    let fileName = await getMigrationName(migName)
+    let migPath = "./src/database/migrations"
+    let isCreated = await verificatePath(migPath)
+    console.log(fileName)
+    if (isCreated) {
+        await writeDestinyFile(migPath + "/" + fileName, "")
+    } else {
+        await createDir(migPath)
+        await writeDestinyFile(migPath + "/" + fileName, "")
+    }
+}
+const getMigrationName = async (migName) => {
+    const currentDate = new Date();
+    // Get the components of date
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const day = currentDate.getDate();
+    // Get the components of hour
+    const hours = currentDate.getHours();
+    const minutes = currentDate.getMinutes();
+    const secconds = currentDate.getSeconds();
+    // Format date and hour
+    const completeDate = `${year}_${month.toString().padStart(2, '0')}_${day.toString().padStart(2, '0')}_`;
+    const completeHour = `${hours.toString().padStart(2, '0')}${minutes.toString().padStart(2, '0')}${secconds.toString().padStart(2, '0')}`;
+    if (migName) {
+        let fileName = completeDate + completeHour + "_" + migName + ".ts"
+        return fileName
+    } else {
+        let fileName = completeDate + completeHour + ".ts"
+        return fileName
+    }
+}
+const makeModel = async (modelName) => {
+    const modelPath = "./src/models"
+    const isCreated = await verificatePath(modelPath + "/" + modelName)
+    const dataModel = await readOriginFile("./node_modules/nodisan/templates/voids/models.ts")
+    const dataInterface = await readOriginFile("./node_modules/nodisan/templates/voids/models.interface.ts")
+    if (isCreated) {
+        console.log(prompt + `File ${modelName + ".ts"} alredy exists.`)
+    } else {
+        await writeDestinyFile(modelPath + "/" + modelName + ".ts", dataModel)
+        await replaceInFile(modelPath + "/" + modelName + ".ts", "{ modelName }", modelName)
+        await writeDestinyFile(modelPath + "/" + modelName + ".interface.ts", dataInterface)
+        await replaceInFile(modelPath + "/" + modelName + ".interface.ts", "{ modelName }", modelName.charAt(0).toUpperCase() + modelName.slice(1))
+    }
 }

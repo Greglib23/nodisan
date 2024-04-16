@@ -15,7 +15,7 @@ declare module 'nodisan/src/resource' {
     function resource(
         router: express.Router,
         crudMethods: CrudMethods,
-        middleware: MiddlewareFunction
+        middleware?: MiddlewareFunction
     ): void;
 
     export default resource;
