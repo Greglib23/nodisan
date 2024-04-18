@@ -59,6 +59,10 @@
         {
             "fileName": "userRoutes.ts",
             "path": "./src/routes/"
+        },
+        {
+            "fileName": "2024_04_16_085521_create_users_table.js",
+            "path": "./src/database/migrations/"
         }
     ]
 }

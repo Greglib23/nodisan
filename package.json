@@ -1,6 +1,6 @@
 {
   "name": "nodisan",
-  "version": "1.5.0-dev",
+  "version": "1.5.1-dev",
   "main": "index.js",
   "type": "module",
   "scripts": {

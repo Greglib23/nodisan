@@ -109,8 +109,8 @@ const handleMake = async (args) => {
     if (args[2] == "make:model") {//Validate what the program will make
         if (args[3]) {
             if (args[4] === "--migration") {
-                await makeModel(args[3])
-                await makeMigration("create_" + args[3] + "_table")
+                await makeModel(args[3], true)
+
             } else {
                 await makeModel(args[3])
             }
@@ -202,9 +202,14 @@ const handleInstall = async (args) => {
             await runVite()
             let front = await verificatePath(templatePaths + "/flags/front")
             if (front) {
+                console.log("")
+                console.log("")
                 console.log(prompt + "I see you installed the frontend in your project! You can run it by doing:")
-                console.log("       cd client")
-                console.log("       npm run dev")
+                console.log("")
+                console.log("\u001B[1m\u001B[32mcd client\u001B[39m\u001B[22m")
+                console.log("\u001B[1m\u001B[32mnpm run dev\u001B[39m\u001B[22m")
+                console.log("")
+                console.log("")
             }
             return
         }
@@ -259,7 +264,6 @@ const makeMigration = async (migName) => {
     let fileName = await getMigrationName(migName)
     let migPath = "./src/database/migrations"
     let isCreated = await verificatePath(migPath)
-    console.log(fileName)
     if (isCreated) {
         await writeDestinyFile(migPath + "/" + fileName, "")
     } else {
@@ -281,24 +285,26 @@ const getMigrationName = async (migName) => {
     const completeDate = `${year}_${month.toString().padStart(2, '0')}_${day.toString().padStart(2, '0')}_`;
     const completeHour = `${hours.toString().padStart(2, '0')}${minutes.toString().padStart(2, '0')}${secconds.toString().padStart(2, '0')}`;
     if (migName) {
-        let fileName = completeDate + completeHour + "_" + migName + ".ts"
+        let fileName = completeDate + completeHour + "_" + migName + ".js"
         return fileName
     } else {
-        let fileName = completeDate + completeHour + ".ts"
+        let fileName = completeDate + completeHour + ".js"
         return fileName
     }
 }
-const makeModel = async (modelName) => {
+const makeModel = async (modelName, migration = false) => {
     const modelPath = "./src/models"
-    const isCreated = await verificatePath(modelPath + "/" + modelName)
+    const isCreated = await verificatePath(modelPath + "/" + modelName + ".ts")
     const dataModel = await readOriginFile("./node_modules/nodisan/templates/voids/models.ts")
     const dataInterface = await readOriginFile("./node_modules/nodisan/templates/voids/models.interface.ts")
     if (isCreated) {
-        console.log(prompt + `File ${modelName + ".ts"} alredy exists.`)
+        console.log(prompt + `File "${modelName}.ts" alredy exists.`)
+        return
     } else {
-        await writeDestinyFile(modelPath + "/" + modelName + ".ts", dataModel)
-        await replaceInFile(modelPath + "/" + modelName + ".ts", "{ modelName }", modelName)
-        await writeDestinyFile(modelPath + "/" + modelName + ".interface.ts", dataInterface)
-        await replaceInFile(modelPath + "/" + modelName + ".interface.ts", "{ modelName }", modelName.charAt(0).toUpperCase() + modelName.slice(1))
+        await writeDestinyFile(modelPath + "/" + modelName + ".js", dataModel)
+        await replaceInFile(modelPath + "/" + modelName + ".js", "{ modelName }", modelName)
+        await writeDestinyFile(modelPath + "/" + modelName + ".interface.js", dataInterface)
+        await replaceInFile(modelPath + "/" + modelName + ".interface.js", "{ modelName }", modelName.charAt(0).toUpperCase() + modelName.slice(1))
     }
+    if (migration) await makeMigration("create_" + modelName + "s_table")
 }
