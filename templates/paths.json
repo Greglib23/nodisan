@@ -61,7 +61,7 @@
             "path": "./src/routes/"
         },
         {
-            "fileName": "2024_04_16_085521_create_users_table.js",
+            "fileName": "2024_04_16_085521_create_users_table.json",
             "path": "./src/database/migrations/"
         }
     ]

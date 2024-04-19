@@ -1,0 +1,11 @@
+{
+    "id": [],
+    "email": [
+        "string",
+        "unique"
+    ],
+    "password": [
+        "string"
+    ],
+    "timestamps": []
+}
