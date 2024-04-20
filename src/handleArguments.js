@@ -147,6 +147,14 @@ const handleMake = async (args) => {
             console.log(prompt + `You have to write a seeder name. Like: "node nodisan make:seeder seederName"`)
         }
     }
+    if (args[2] == "make:mail") {//Validate what the program will make
+        if (args[3]) {
+            await makeMail(args[3])
+            return
+        } else {
+            console.log(prompt + `You have to write a seeder name. Like: "node nodisan make:mail mailName"`)
+        }
+    }
     console.log(prompt + 'Unknow command: ' + args[2])
     return
 }
@@ -405,3 +413,32 @@ const makeSeeder = async (fileName) => {
 const handleDb = async () => {
     await runCommand("npx tsx src/database/seeders/databaseSeeder.ts", "Running seeder...", "Seeder sended!")
 }
+/**
+ * This function create a new mail template.
+ * @param {string} fileName - Name of the mail without extension
+ */
+const makeMail = async (fileName) => {
+    // Verify if the directory exists, if not, create it.
+    let isCreated = await verificatePath(`./src/mail`)
+    if (!isCreated) {
+        await createDir(`./src/mail`)
+    }
+    // Verify if the seeder file exists, if it does, abort.
+    isCreated = await verificatePath(`./src/mail/${fileName}.ts`)
+    if (isCreated) {
+        console.log(prompt + `File "${fileName}.ts" alredy exists.`)
+        return
+    }
+    // Verify if the html file exists, if it does, abort.
+    isCreated = await verificatePath(`./src/mail/${fileName}.html`)
+    if (isCreated) {
+        console.log(prompt + `File "${fileName}.html" alredy exists.`)
+        return
+    }
+    // Copy the template and replace the string with the name of the mail.
+    await copyFile(templatePaths + "voids/emailName.ts", `./src/mail/${fileName}.ts`, true)
+    await replaceInFile(`./src/mail/${fileName}.ts`, "{ emailName }", fileName)
+    // Copy the seeder template and replace the string with the name of the mail.
+    await copyFile(templatePaths + "voids/emailName.html", `./src/mail/${fileName}.html`, true)
+}
+

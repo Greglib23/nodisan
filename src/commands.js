@@ -53,8 +53,8 @@ export const runCommand = async (command, msg, msg2) => {
 
 }
 export const installCommands = async () => {
-    const devComm = "npm install tsx ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/node rimraf prisma --save-dev"
-    const depComm = "npm install express jsonwebtoken bcrypt @prisma/client dotenv typescript"
+    const devComm = "npm install tsx ts-node-dev @types/express @types/jsonwebtoken @types/bcrypt @types/nodemailer @types/node rimraf prisma --save-dev"
+    const depComm = "npm install express jsonwebtoken bcrypt @prisma/client dotenv typescript nodemailer"
     const tsxComm = "npx tsc --init --outDir dist/ --rootDir src"
     await runCommand(devComm, "Installing dev dependencies...")
     await runCommand(depComm, "Installing dependencies...")
