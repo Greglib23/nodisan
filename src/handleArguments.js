@@ -53,6 +53,10 @@ export const handleArguments = async (args) => {
         await handleBuild(args)
         return
     }
+    if (args[2] == "db:seed") {
+        await handleDb()
+        return
+    }
 
     if (args.length > 2) console.log(prompt + 'Unknow command: "' + args[2] + '"')
 }
@@ -134,6 +138,14 @@ const handleMake = async (args) => {
             console.log(prompt + `You have to write a model name. Like: '"node nodisan make:controller controllerName"`)
         }
         return
+    }
+    if (args[2] == "make:seeder") {//Validate what the program will make
+        if (args[3]) {
+            await makeSeeder(args[3])
+            return
+        } else {
+            console.log(prompt + `You have to write a seeder name. Like: "node nodisan make:seeder seederName"`)
+        }
     }
     console.log(prompt + 'Unknow command: ' + args[2])
     return
@@ -380,4 +392,16 @@ const removeMigration = async (cant) => {
         fs.rmSync(migracionPath, { recursive: true, force: true });
         console.log(`Migración eliminada: ${migracion}`);
     });
+}
+const makeSeeder = async (fileName) => {
+    let isCreated = await verificatePath(`./src/database/seeders/${fileName}.ts`)
+    if (isCreated) {
+        console.log(prompt + `File "${fileName}.ts" alredy exists.`)
+        return
+    }
+    await copyFile(templatePaths + "voids/seederName.ts", `./src/database/seeders/${fileName}.ts`, true)
+    await replaceInFile(`./src/database/seeders/${fileName}.ts`, "{ modelName }", fileName.slice(0, -6))
+}
+const handleDb = async () => {
+    await runCommand("npx tsx src/database/seeders/databaseSeeder.ts", "Running seeder...", "Seeder sended!")
 }

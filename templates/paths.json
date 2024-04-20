@@ -63,6 +63,14 @@
         {
             "fileName": "2024_04_16_085521_create_users_table.json",
             "path": "./src/database/migrations/"
+        },
+        {
+            "fileName": "userSeeder.ts",
+            "path": "./src/database/seeders/"
+        },
+        {
+            "fileName": "databaseSeeder.ts",
+            "path": "./src/database/seeders/"
         }
     ]
 }
