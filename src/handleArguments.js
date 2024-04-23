@@ -419,26 +419,26 @@ const handleDb = async () => {
  */
 const makeMail = async (fileName) => {
     // Verify if the directory exists, if not, create it.
-    let isCreated = await verificatePath(`./src/mail`)
+    let isCreated = await verificatePath(`./src/mail/${fileName}`)
     if (!isCreated) {
-        await createDir(`./src/mail`)
+        await createDir(`./src/mail/${fileName}`)
     }
     // Verify if the seeder file exists, if it does, abort.
-    isCreated = await verificatePath(`./src/mail/${fileName}.ts`)
+    isCreated = await verificatePath(`./src/mail/${fileName}/${fileName}.ts`)
     if (isCreated) {
         console.log(prompt + `File "${fileName}.ts" alredy exists.`)
         return
     }
     // Verify if the html file exists, if it does, abort.
-    isCreated = await verificatePath(`./src/mail/${fileName}.html`)
+    isCreated = await verificatePath(`./src/mail/${fileName}/${fileName}.html`)
     if (isCreated) {
         console.log(prompt + `File "${fileName}.html" alredy exists.`)
         return
     }
     // Copy the template and replace the string with the name of the mail.
-    await copyFile(templatePaths + "voids/emailName.ts", `./src/mail/${fileName}.ts`, true)
-    await replaceInFile(`./src/mail/${fileName}.ts`, "{ emailName }", fileName)
+    await copyFile(templatePaths + "voids/emailName.ts", `./src/mail/${fileName}/${fileName}.ts`, true)
+    await replaceInFile(`./src/mail/${fileName}/${fileName}.ts`, "{ emailName }", `${fileName}/${fileName}`)
     // Copy the seeder template and replace the string with the name of the mail.
-    await copyFile(templatePaths + "voids/emailName.html", `./src/mail/${fileName}.html`, true)
+    await copyFile(templatePaths + "voids/emailName.html", `./src/mail/${fileName}/${fileName}.html`, true)
 }
 

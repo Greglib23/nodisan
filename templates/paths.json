@@ -71,6 +71,10 @@
         {
             "fileName": "databaseSeeder.ts",
             "path": "./src/database/seeders/"
+        },
+        {
+            "fileName": "verifyTransporter.service.ts",
+            "path": "./src/services/"
         }
     ]
 }
