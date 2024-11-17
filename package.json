@@ -1,10 +1,10 @@
 {
   "name": "nodisan",
-  "version": "1.5.14-dev",
+  "version": "1.5.17-dev",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "node src/createNodisan.js"
+    "postinstall": "node lib/createNodisan.js"
   },
   "keywords": [],
   "author": "greglib23",
